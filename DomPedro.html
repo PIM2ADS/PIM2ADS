@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canal de Denúncia Varejão Dom Pedro</title>
+    <style>
+        /* Estilos básicos */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f2e6; /* Fundo verde claro */
+            margin: 0;
+            padding: 0;
+            color: #2e4d32; /* Cor verde escuro */
+        }
+
+        /* Barra de navegação */
+        .navbar {
+            background-color: #3c7d3f; /* Verde escuro */
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            font-size: 18px;
+        }
+
+        .navbar a:hover {
+            background-color: #285d2e;
+            border-radius: 5px;
+        }
+
+        /* Container principal */
+        .container {
+            background-color: #fff;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos do título */
+        h1, h2 {
+            text-align: center;
+            color: #2e4d32;
+        }
+
+        /* Seção de informações */
+        .section {
+            margin-bottom: 20px;
+        }
+
+        /* Botão de denúncia */
+        .report-button {
+            display: block;
+            background-color: #3c7d3f;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin: 20px auto;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 60%;
+            max-width: 300px;
+        }
+
+        .report-button:hover {
+            background-color: #285d2e;
+        }
+
+        /* Caixa de texto e botão enviar */
+        .form-container {
+            text-align: center;
+            display: none;
+        }
+
+        .form-container textarea {
+            width: 80%;
+            height: 150px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .form-container .submit-button {
+            background-color: #3c7d3f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .form-container .submit-button:hover {
+            background-color: #285d2e;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegação -->
+    <div class="navbar">
+        <a href="#home">Início</a>
+        <a href="#denuncia">Denúncia</a>
+        <a href="#contato">Contato</a>
+    </div>
+
+    <!-- Container principal -->
+    <div class="container" id="home">
+        <h1>Canal de Denúncia Varejão Dom Pedro</h1>
+        <h2>Aqui você está seguro</h2>
+
+        <div class="section">
+            <h3>O que é Ética e Moral?</h3>
+            <p>Ética é o conjunto de princípios e valores que guiam o comportamento humano, promovendo o bem-estar e a harmonia social. Moral, por sua vez, refere-se às normas e regras que são seguidas por um grupo ou sociedade específica, ditando o que é considerado certo ou errado.</p>
+            <p>Seguir a ética e a moral no ambiente de trabalho é essencial para manter um local seguro, justo e harmonioso para todos os colaboradores.</p>
+        </div>
+
+        <div class="section">
+            <h3>Tipos de Assédio</h3>
+            <ul>
+                <li><strong>Assédio Moral:</strong> Comportamentos repetitivos e ofensivos, que expõem o colaborador a situações humilhantes ou constrangedoras.</li>
+                <li><strong>Assédio Sexual:</strong> Ato de solicitar favores sexuais, fazer comentários inadequados ou realizar toques indesejados.</li>
+                <li><strong>Assédio Discriminatório:</strong> Práticas que discriminam um indivíduo com base em características como raça, gênero, orientação sexual, idade, religião ou deficiência.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Como Evitar o Assédio</h3>
+            <ul>
+                <li>Respeitar todos os colaboradores, independentemente de suas diferenças.</li>
+                <li>Evitar comentários ofensivos, brincadeiras de mau gosto ou invasão do espaço pessoal.</li>
+                <li>Denunciar imediatamente qualquer comportamento inapropriado ao RH ou ao canal de denúncia.</li>
+                <li>Participar de treinamentos e campanhas de conscientização promovidas pela empresa.</li>
+            </ul>
+        </div>
+
+        <button class="report-button" id="denuncia" onclick="showForm()">Denunciar Assédio ou Outras Informações</button>
+        
+        <div class="form-container" id="formContainer">
+            <h3>Relatar Denúncia</h3>
+            <textarea placeholder="Descreva a situação..."></textarea><br>
+            <button class="submit-button" onclick="submitForm()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        // Função para mostrar o formulário de denúncia
+        function showForm() {
+            document.getElementById('formContainer').style.display = 'block';
+            window.location.href = "#formContainer";
+        }
+
+        // Função de envio do formulário (apenas um exemplo)
+        function submitForm() {
+            alert('Denúncia enviada com sucesso!');
+            // Aqui você pode adicionar a lógica para envio dos dados para o servidor
+        }
+    </script>
+</body>
+</html>

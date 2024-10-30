@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Varejão Dom Pedro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #4caf50; /* Fundo verde */
+            color: #2c3e50; /* Cor do texto */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #388e3c; /* Verde escuro */
+            color: white;
+            text-align: center;
+            padding: 1.5em 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #e0f2e9; /* Caixa verde claro */
+            border-radius: 10px;
+            width: 300px; /* Largura da caixa */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+        }
+
+        button {
+            background-color: #ff9800; /* Laranja */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px 0; /* Espaçamento vertical */
+            font-size: 16px;
+            width: 100%; /* Largura total da caixa */
+            margin: 10px 0; /* Espaço entre os botões */
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #e68a00; /* Tom mais escuro de laranja ao passar o mouse */
+        }
+
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Varejão Dom Pedro</h1>
+</header>
+
+<div class="container">
+    <h3>Cadastrar Produto</h3>
+    <input type="text" id="nome" placeholder="Nome do Produto" required>
+    <input type="number" id="valorVenda" placeholder="Valor de Venda" required>
+    <input type="number" id="valorCompra" placeholder="Valor de Compra" required>
+    <input type="text" id="codigoBarras" placeholder="Código de Barras" required>
+    <input type="number" id="quantidadePrateleira" placeholder="Quantidade na Prateleira" required>
+    <input type="number" id="quantidadeEstoque" placeholder="Quantidade no Estoque" required>
+    <button onclick="cadastrarProduto()">Cadastrar Produto</button>
+
+    <h3>Deletar Produto</h3>
+    <input type="number" id="idDeletar" placeholder="ID do Produto" required>
+    <button onclick="deletarProduto()">Deletar Produto</button>
+
+    <h3>Listar Produtos</h3>
+    <button onclick="listarProdutos()">Listar Produtos</button>
+    <div id="produtosListados" class="hidden"></div>
+
+    <h3>Registrar Venda</h3>
+    <input type="number" id="idVenda" placeholder="ID do Produto" required>
+    <input type="number" id="quantidadeVenda" placeholder="Quantidade Vendida" required>
+    <button onclick="registrarVenda()">Registrar Venda</button>
+
+    <h3>Gerar Relatório de Vendas</h3>
+    <button onclick="gerarRelatorio()">Gerar Relatório</button>
+
+    <h3>Verificar Reposição de Estoque</h3>
+    <button onclick="verificarEstoque()">Verificar Estoque</button>
+    <div id="estoqueBaixo" class="hidden"></div>
+</div>
+
+<script>
+    let produtos = [];
+    let vendas = [];
+
+    function cadastrarProduto() {
+        const nome = document.getElementById('nome').value;
+        const valorVenda = parseFloat(document.getElementById('valorVenda').value);
+        const valorCompra = parseFloat(document.getElementById('valorCompra').value);
+        const codigoBarras = document.getElementById('codigoBarras').value;
+        const quantidadePrateleira = parseInt(document.getElementById('quantidadePrateleira').value);
+        const quantidadeEstoque = parseInt(document.getElementById('quantidadeEstoque').value);
+        
+        const novoProduto = {
+            id: produtos.length + 1,
+            nome,
+            valorVenda,
+            valorCompra,
+            codigoBarras,
+            quantidadePrateleira,
+            quantidadeEstoque
+        };
+        
+        produtos.push(novoProduto);
+        alert("Produto cadastrado com sucesso!");
+        limparCampos();
+    }
+
+    function limparCampos() {
+        document.getElementById('nome').value = '';
+        document.getElementById('valorVenda').value = '';
+        document.getElementById('valorCompra').value = '';
+        document.getElementById('codigoBarras').value = '';
+        document.getElementById('quantidadePrateleira').value = '';
+        document.getElementById('quantidadeEstoque').value = '';
+        document.getElementById('idDeletar').value = '';
+        document.getElementById('idVenda').value = '';
+        document.getElementById('quantidadeVenda').value = '';
+    }
+
+    function deletarProduto() {
+        const id = parseInt(document.getElementById('idDeletar').value);
+        const index = produtos.findIndex(produto => produto.id === id);
+        
+        if (index !== -1) {
+            produtos.splice(index, 1);
+            alert("Produto deletado com sucesso!");
+        } else {
+            alert("Produto não encontrado!");
+        }
+        document.getElementById('idDeletar').value = '';
+    }
+
+    function listarProdutos() {
+        const produtosListados = document.getElementById('produtosListados');
+        produtosListados.innerHTML = '';
+        
+        if (produtos.length === 0) {
+            produtosListados.innerHTML = 'Nenhum produto cadastrado.';
+        } else {
+            produtos.forEach(produto => {
+                produtosListados.innerHTML += `
+                    <p>ID: ${produto.id} | Nome: ${produto.nome} | Valor de Venda: R$ ${produto.valorVenda.toFixed(2)} | Quantidade em Estoque: ${produto.quantidadeEstoque}</p>
+                `;
+            });
+        }
+        
+        produtosListados.classList.remove('hidden');
+    }
+
+    function registrarVenda() {
+        const id = parseInt(document.getElementById('idVenda').value);
+        const quantidade = parseInt(document.getElementById('quantidadeVenda').value);
+        const produto = produtos.find(prod => prod.id === id);
+        
+        if (produto) {
+            if (quantidade <= produto.quantidadeEstoque) {
+                produto.quantidadeEstoque -= quantidade;
+                vendas.push({ id: produto.id, nome: produto.nome, quantidade });
+                alert("Venda registrada com sucesso!");
+            } else {
+                alert("Quantidade em estoque insuficiente!");
+            }
+        } else {
+            alert("Produto não encontrado!");
+        }
+        document.getElementById('idVenda').value = '';
+        document.getElementById('quantidadeVenda').value = '';
+    }
+
+    function gerarRelatorio() {
+        let relatorio = "Relatório de Vendas:\n";
+        
+        if (vendas.length === 0) {
+            relatorio += "Nenhuma venda registrada.";
+        } else {
+            vendas.forEach(venda => {
+                relatorio += `ID do Produto: ${venda.id} | Nome: ${venda.nome} | Quantidade Vendida: ${venda.quantidade}\n`;
+            });
+        }
+        
+        alert(relatorio);
+    }
+
+    function verificarEstoque() {
+        const estoqueBaixo = document.getElementById('estoqueBaixo');
+        estoqueBaixo.innerHTML = '';
+        
+        const produtosBaixos = produtos.filter(prod => prod.quantidadeEstoque < prod.quantidadePrateleira);
+        
+        if (produtosBaixos.length === 0) {
+            estoqueBaixo.innerHTML = 'Todos os produtos estão com estoque suficiente.';
+        } else {
+            produtosBaixos.forEach(produto => {
+                estoqueBaixo.innerHTML += `<p>Produto: ${produto.nome} | Estoque Atual: ${produto.quantidadeEstoque}</p>`;
+            });
+        }
+        
+        estoqueBaixo.classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
