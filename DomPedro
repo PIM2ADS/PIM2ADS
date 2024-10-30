@@ -1,0 +1,253 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#define MAX_PRODUTOS 100
+#define LIMITE_MINIMO 10
+
+typedef struct {
+    int id;
+    char nome[50];
+    char codigo_barras[20];
+    int quantidade_estoque;
+    int quantidade_prateleira;
+    char data_validade[11];
+    char data_entrada[11];
+    float preco_venda;
+    float preco_compra;
+} Produto;
+
+typedef struct {
+    int id_produto;
+    char nome[50];
+    float valor_venda;
+    int quantidade_vendida;
+} Venda;
+
+Produto produtos[MAX_PRODUTOS];
+Venda vendas[MAX_PRODUTOS];
+int total_produtos = 0;
+int total_vendas = 0;
+
+// Função para obter a data atual no formato "DD/MM/AAAA"
+void obterDataAtual(char *data) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    sprintf(data, "%02d/%02d/%d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+}
+
+// Função para limpar o buffer de entrada
+void limparBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {}
+}
+
+// Função para cadastrar um novo produto
+void cadastrarProduto() {
+    if (total_produtos >= MAX_PRODUTOS) {
+        printf("Limite de produtos atingido.\n");
+        return;
+    }
+
+    Produto p;
+    p.id = total_produtos + 1;
+    printf("Nome do Produto: ");
+    limparBuffer(); // Limpa o buffer antes de ler a string
+    fgets(p.nome, sizeof(p.nome), stdin);
+    p.nome[strcspn(p.nome, "\n")] = '\0'; // Remove o caractere de nova linha
+
+    printf("Código de Barras: ");
+    fgets(p.codigo_barras, sizeof(p.codigo_barras), stdin);
+    p.codigo_barras[strcspn(p.codigo_barras, "\n")] = '\0';
+
+    printf("Quantidade em Estoque: ");
+    scanf("%d", &p.quantidade_estoque);
+
+    printf("Quantidade na Prateleira: ");
+    scanf("%d", &p.quantidade_prateleira);
+
+    printf("Data de Validade (DD/MM/AAAA): ");
+    limparBuffer();
+    fgets(p.data_validade, sizeof(p.data_validade), stdin);
+    p.data_validade[strcspn(p.data_validade, "\n")] = '\0';
+
+    obterDataAtual(p.data_entrada); // Data de entrada atual
+
+    printf("Preço de Venda: ");
+    scanf("%f", &p.preco_venda);
+
+    printf("Preço de Compra: ");
+    scanf("%f", &p.preco_compra);
+
+    produtos[total_produtos++] = p;
+    printf("Produto cadastrado com sucesso!\n");
+}
+
+// Função para listar todos os produtos
+void listarProdutos() {
+    if (total_produtos == 0) {
+        printf("\nNenhum produto cadastrado.\n");
+        return;
+    }
+
+    printf("\nLista de Produtos:\n");
+    printf("-------------------------------------------------------------------------------\n");
+    printf("| ID | Nome                | Código de Barras  | Estoque | Prateleira | Validade |\n");
+    printf("-------------------------------------------------------------------------------\n");
+
+    for (int i = 0; i < total_produtos; i++) {
+        printf("| %2d | %-20s | %-15s | %7d | %10d | %-10s |\n",
+               produtos[i].id, produtos[i].nome, produtos[i].codigo_barras, 
+               produtos[i].quantidade_estoque, produtos[i].quantidade_prateleira, 
+               produtos[i].data_validade);
+    }
+    printf("-------------------------------------------------------------------------------\n");
+}
+
+// Função para deletar um produto
+void deletarProduto() {
+    int id;
+    printf("Digite o ID do produto a ser deletado: ");
+    scanf("%d", &id);
+
+    if (id < 1 || id > total_produtos) {
+        printf("Produto com ID %d não encontrado.\n", id);
+        return;
+    }
+
+    // Ajusta o índice do produto no array
+    for (int i = id - 1; i < total_produtos - 1; i++) {
+        produtos[i] = produtos[i + 1];
+    }
+    total_produtos--;
+    printf("Produto deletado com sucesso!\n");
+
+    // Atualiza os IDs dos produtos restantes
+    for (int i = 0; i < total_produtos; i++) {
+        produtos[i].id = i + 1;
+    }
+}
+
+// Função para registrar uma venda
+void registrarVenda() {
+    int id_produto, quantidade;
+    printf("ID do Produto vendido: ");
+    scanf("%d", &id_produto);
+    printf("Quantidade vendida: ");
+    scanf("%d", &quantidade);
+
+    if (id_produto < 1 || id_produto > total_produtos || quantidade <= 0) {
+        printf("Venda inválida.\n");
+        return;
+    }
+
+    Produto *p = &produtos[id_produto - 1];
+
+    if (p->quantidade_estoque < quantidade) {
+        printf("Estoque insuficiente.\n");
+        return;
+    }
+
+    p->quantidade_estoque -= quantidade;
+
+    Venda v;
+    v.id_produto = p->id;
+    strcpy(v.nome, p->nome);
+    v.valor_venda = p->preco_venda * quantidade;
+    v.quantidade_vendida = quantidade;
+    vendas[total_vendas++] = v;
+
+    printf("Venda registrada com sucesso!\n");
+}
+
+// Função para verificar produtos em falta no estoque
+void verificarReposicaoEstoque() {
+    printf("\nProdutos em Falta:\n");
+    for (int i = 0; i < total_produtos; i++) {
+        if (produtos[i].quantidade_estoque < LIMITE_MINIMO) {
+            int quantidade_repor = LIMITE_MINIMO - produtos[i].quantidade_estoque;
+            printf("Produto: %s, ID: %d, Estoque Atual: %d, Sugerido para Compra: %d\n",
+                   produtos[i].nome, produtos[i].id, produtos[i].quantidade_estoque, quantidade_repor);
+        }
+    }
+}
+
+// Função para listar o que há em estoque
+void listarEstoque() {
+    if (total_produtos == 0) {
+        printf("\nNenhum produto cadastrado.\n");
+        return;
+    }
+
+    printf("\nEstoque Atual:\n");
+    printf("------------------------------------------------------------\n");
+    printf("| ID | Nome                | Estoque |\n");
+    printf("------------------------------------------------------------\n");
+
+    for (int i = 0; i < total_produtos; i++) {
+        printf("| %2d | %-20s | %7d |\n", produtos[i].id, produtos[i].nome, produtos[i].quantidade_estoque);
+    }
+    printf("------------------------------------------------------------\n");
+}
+
+// Função para gerar relatório semanal de vendas e lucro
+void gerarRelatorioSemanal() {
+    float total_vendas_semana = 0;
+    float total_lucro = 0;
+
+    printf("\nRelatório Semanal de Vendas:\n");
+    for (int i = 0; i < total_vendas; i++) {
+        float custo_produtos = vendas[i].quantidade_vendida * produtos[vendas[i].id_produto - 1].preco_compra;
+        float lucro = vendas[i].valor_venda - custo_produtos;
+        total_vendas_semana += vendas[i].valor_venda;
+        total_lucro += lucro;
+
+        printf("Produto: %s, ID: %d, Quantidade Vendida: %d, Valor Venda: %.2f, Lucro: %.2f\n",
+               vendas[i].nome, vendas[i].id_produto, vendas[i].quantidade_vendida, vendas[i].valor_venda, lucro);
+    }
+
+    printf("\nTotal de Vendas da Semana: %.2f\n", total_vendas_semana);
+    printf("Lucro Bruto da Semana: %.2f\n", total_lucro);
+}
+
+int main() {
+    int opcao;
+
+    do {
+        printf("\nMenu:\n1. Cadastrar Produto\n2. Listar Produtos\n3. Registrar Venda\n4. Verificar Reposição de Estoque\n5. Listar Estoque\n6. Gerar Relatório Semanal\n7. Deletar Produto\n0. Sair\nEscolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                cadastrarProduto();
+                break;
+            case 2:
+                listarProdutos();
+                break;
+            case 3:
+                registrarVenda();
+                break;
+            case 4:
+                verificarReposicaoEstoque();
+                break;
+            case 5:
+                listarEstoque();
+                break;
+            case 6:
+                gerarRelatorioSemanal();
+                break;
+            case 7:
+                deletarProduto();
+                break;
+            case 0:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida. Tente novamente.\n");
+                break;
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
